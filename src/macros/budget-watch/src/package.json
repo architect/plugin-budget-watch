@@ -1,0 +1,12 @@
+{
+  "name": "trigger-lambda",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-lambda": "^3.31.0",
+    "@aws-sdk/client-resource-groups-tagging-api": "^3.31.0",
+    "@aws-sdk/client-ssm": "^3.32.0"
+  }
+}

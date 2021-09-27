@@ -1,0 +1,21 @@
+{
+  "name": "arc-budget-watch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "hydrate:macro": "cd src/macros/budget-watch/src && npm i"
+  },
+  "author": "Ryan Bethel",
+  "dependencies": {
+    "@architect/architect": "^9.0.1",
+    "@architect/functions": "^4.0.0",
+    "@architect/sandbox": "^4.1.0-RC.0"
+  },
+  "devDependencies": {
+    "@architect/eslint-config": "^2.0.0",
+    "eslint": "^7.11.0"
+  },
+  "eslintConfig": {
+    "extends": "@architect/eslint-config"
+  }
+}
