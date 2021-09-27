@@ -52,16 +52,16 @@ exports.handler =  async function handler (event) {
       })
     }))
     let concurrencies = concurrencyResponses.map(response => response.ReservedConcurrentExecutions)
-    let concurrencyTuples = targetLambdas.map((name, i) => ([ name, concurrencies[i] ]))
-      .filter(tuple => tuple[1] !== 'not found')
-    console.log({ concurrencyTuples })
+    let concurrencyPairs = targetLambdas.map((name, i) => ([ name, concurrencies[i] ]))
+      .filter(pair => pair[1] !== 'not found')
+    console.log({ concurrencyPairs })
 
     let ssmClient = new SSMClient({ region })
     let ssmParams = {
       Name: triggerSsm,
       Type: 'String',
       Overwrite: true,
-      Value: JSON.stringify(concurrencyTuples),
+      Value: JSON.stringify(concurrencyPairs),
       Tag: { Key: 'aws:cloudformation:stack-name', Value: stackName }
     }
     let ssmCommand = new PutParameterCommand(ssmParams)
