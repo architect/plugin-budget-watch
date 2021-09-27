@@ -144,6 +144,10 @@ module.exports = function costDetection (arc, cfn) {
 
     // TODO: create the SSM parameter in CFN as a placeholder so that it will be cleaned up if the stack is deleted
 
+    // TODO: Get lambda concurrencies from CFN instead of getting them from the trigger api call. This will fix the edge 
+    // case where concurrency is changed after limit is triggered, but before it is reset. Currently the reset will undo the 
+    // intermediate update.
+
     cfn.Resources[resetRole] = {
       Type: 'AWS::IAM::Role',
       Properties: {
