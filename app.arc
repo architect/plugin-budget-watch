@@ -1,5 +1,5 @@
 @app
-arc-budget-two
+arc-budget
 
 @http
 get /
@@ -12,4 +12,4 @@ limit $40
 
 @aws
 region us-east-1
-profile begin-examples
+profile default
