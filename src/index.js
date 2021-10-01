@@ -35,7 +35,7 @@ exports.handler =  async function handler (event) {
 
       targetLambdas = allLambdas.map(group => group.map(item => item.ResourceARN))
         .flat()
-        .filter(lambda => !lambda.includes(`${stackName}-${triggerLambda}`) && !lambda.includes(`${stackName}-${resetLambda}`))
+        .filter(lambda => !lambda.includes(triggerLambda) && !lambda.includes(resetLambda))
       console.log({ targetLambdas })
     }
     catch (e){

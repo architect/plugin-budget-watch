@@ -1,19 +1,22 @@
 {
-  "name": "arc-budget-watch",
-  "version": "1.0.0",
+  "name": "plugin-budget-watch",
+  "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "hydrate:macro": "cd src/macros/budget-watch/src && npm i"
+    "hydrate:trigger": "cd src/ && npm i",
+    "hydrate:tests": "cd test/test-app/ && npm i && npx arc init",
+    "postinstall": "npm run hydrate:trigger && npm run hydrate:tests",
+    "test": "QUIET=1 tape test/integration-test.js | tap-spec"
   },
   "author": "Ryan Bethel",
   "dependencies": {
-    "@architect/architect": "^9.0.1",
-    "@architect/functions": "^4.0.0",
-    "@architect/sandbox": "^4.1.0-RC.0"
+    "@architect/architect": "^9.0.1"
   },
   "devDependencies": {
     "@architect/eslint-config": "^2.0.0",
-    "eslint": "^7.11.0"
+    "eslint": "^7.11.0",
+    "tap-spec": "^5.0.0",
+    "tape": "^5.3.1"
   },
   "eslintConfig": {
     "extends": "@architect/eslint-config"

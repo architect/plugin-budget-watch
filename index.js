@@ -6,11 +6,14 @@ module.exports = function costDetection (arc, cfn) {
   let guard = arc['budget']
 
   if (guard) {
+    let limitRow = guard.find(row => row[0] === 'limit')
+    let emailRow = guard.find(row => row[0] === 'email')
+    let email = emailRow && emailRow[1]
 
     let name = toLogicalID('budget-watch')
     let triggerSrc = path.resolve(__dirname, './src')
     let defaultBudget = 100
-    let triggerAmount = guard && guard[0][0] === 'limit' ? Number(guard[0][1].replace('$', '')) : defaultBudget
+    let triggerAmount = limitRow ? Number(limitRow[1].replace('$', '')) : defaultBudget
     let triggerLambda = `${name}TriggerLambda`
     let triggerEvent = `${name}TriggerEvent`
     let triggerTopic = `${name}TriggerTopic`
@@ -79,6 +82,7 @@ module.exports = function costDetection (arc, cfn) {
         PolicyDocument: {
           Statement: [
             {
+              Sid: 'allowBudget',
               Effect: 'Allow',
               Principal: {
                 Service: 'budgets.amazonaws.com'
@@ -87,7 +91,7 @@ module.exports = function costDetection (arc, cfn) {
               Resource: {
                 Ref: triggerTopic
               }
-            }
+            },
           ]
         },
         Topics: [
@@ -135,6 +139,14 @@ module.exports = function costDetection (arc, cfn) {
       }
     }
 
+    // Add Email Notification
+    if (email){
+      cfn.Resources[budget].Properties.NotificationsWithSubscribers.Subscribers.push({
+        SubscriptionType: 'EMAIL',
+        Address: email
+      })
+    }
+
     // Make all lambdas dependant on the reset custom resource
     // The SAM function resource does not expose the DependsOn property
     // Use a tag with GetAtt to make all functions dependant
@@ -144,8 +156,8 @@ module.exports = function costDetection (arc, cfn) {
 
     // TODO: create the SSM parameter in CFN as a placeholder so that it will be cleaned up if the stack is deleted
 
-    // TODO: Get lambda concurrencies from CFN instead of getting them from the trigger api call. This will fix the edge 
-    // case where concurrency is changed after limit is triggered, but before it is reset. Currently the reset will undo the 
+    // TODO: Get lambda concurrencies from CFN instead of getting them from the trigger api call. This will fix the edge
+    // case where concurrency is changed after limit is triggered, but before it is reset. Currently the reset will undo the
     // intermediate update.
 
     cfn.Resources[resetRole] = {
