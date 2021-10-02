@@ -1,7 +1,7 @@
 let { toLogicalID } = require('@architect/utils')
 let path = require('path')
 
-module.exports = function costDetection (arc, cfn) {
+function package ({ arc, cloudformation }) {
 
   let guard = arc['budget']
 
@@ -26,7 +26,7 @@ module.exports = function costDetection (arc, cfn) {
 
 
     // Create the Trigger Lambda
-    cfn.Resources[triggerLambda] = {
+    cloudformation.Resources[triggerLambda] = {
       Type: 'AWS::Serverless::Function',
       Properties: {
         Handler: 'index.handler',
@@ -68,7 +68,7 @@ module.exports = function costDetection (arc, cfn) {
     }
 
     // Create the Trigger SNS topic
-    cfn.Resources[triggerTopic] = {
+    cloudformation.Resources[triggerTopic] = {
       Type: 'AWS::SNS::Topic',
       Properties: {
         DisplayName: name,
@@ -76,7 +76,7 @@ module.exports = function costDetection (arc, cfn) {
       }
     }
 
-    cfn.Resources[triggerPolicy] = {
+    cloudformation.Resources[triggerPolicy] = {
       Type: 'AWS::SNS::TopicPolicy',
       Properties: {
         PolicyDocument: {
@@ -103,7 +103,7 @@ module.exports = function costDetection (arc, cfn) {
     }
 
     // Create the Budget to trigger on
-    cfn.Resources[budget] = {
+    cloudformation.Resources[budget] = {
       Type: 'AWS::Budgets::Budget',
       Properties: {
         Budget: {
@@ -141,7 +141,7 @@ module.exports = function costDetection (arc, cfn) {
 
     // Add Email Notification
     if (email){
-      cfn.Resources[budget].Properties.NotificationsWithSubscribers.Subscribers.push({
+      cloudformation.Resources[budget].Properties.NotificationsWithSubscribers.Subscribers.push({
         SubscriptionType: 'EMAIL',
         Address: email
       })
@@ -150,8 +150,8 @@ module.exports = function costDetection (arc, cfn) {
     // Make all lambdas dependant on the reset custom resource
     // The SAM function resource does not expose the DependsOn property
     // Use a tag with GetAtt to make all functions dependant
-    let lambdas = Object.keys(cfn.Resources).filter( name => cfn.Resources[name].Type === 'AWS::Serverless::Function')
-    lambdas.forEach(resource => { cfn.Resources[resource].Properties.Tags = { 'CustomDependsOn': { 'Fn::GetAtt': [ resetCustomResource, 'DependsOn' ] } } }  )
+    let lambdas = Object.keys(cloudformation.Resources).filter( name => cloudformation.Resources[name].Type === 'AWS::Serverless::Function')
+    lambdas.forEach(resource => { cloudformation.Resources[resource].Properties.Tags = { 'CustomDependsOn': { 'Fn::GetAtt': [ resetCustomResource, 'DependsOn' ] } } }  )
 
 
     // TODO: create the SSM parameter in CFN as a placeholder so that it will be cleaned up if the stack is deleted
@@ -160,7 +160,7 @@ module.exports = function costDetection (arc, cfn) {
     // case where concurrency is changed after limit is triggered, but before it is reset. Currently the reset will undo the
     // intermediate update.
 
-    cfn.Resources[resetRole] = {
+    cloudformation.Resources[resetRole] = {
       Type: 'AWS::IAM::Role',
       Properties: {
         AssumeRolePolicyDocument: {
@@ -190,7 +190,7 @@ module.exports = function costDetection (arc, cfn) {
             } } ]
       } }
 
-    cfn.Resources[resetCustomResource] = {
+    cloudformation.Resources[resetCustomResource] = {
       Type: 'AWS::CloudFormation::CustomResource',
       Properties: {
         ServiceToken: { 'Fn::GetAtt': `${resetLambda}.Arn` },
@@ -205,7 +205,7 @@ module.exports = function costDetection (arc, cfn) {
     // The code must be inlined with ZipFile to use the cfn-response module.
     // * Warning: If this lambda does not respond for any reason the stack deploy will
     // be hang for up to an hour until the operation times out.
-    cfn.Resources[resetLambda] = {
+    cloudformation.Resources[resetLambda] = {
       Type: 'AWS::Lambda::Function',
       Properties: {
         Handler: 'index.handler',
@@ -278,7 +278,8 @@ module.exports = function costDetection (arc, cfn) {
     }
   }
 
-  return cfn
+  return cloudformation
 
 }
 
+module.exports = { package }

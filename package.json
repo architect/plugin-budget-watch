@@ -1,14 +1,25 @@
 {
-  "name": "plugin-budget-watch",
+  "name": "@architect/plugin-budget-watch",
   "version": "0.0.0",
+  "description": "Architect plugin for limiting cost of deployed apps",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint . --fix",
     "hydrate:trigger": "cd src/ && npm i",
     "hydrate:tests": "cd test/test-app/ && npm i && npx arc init",
-    "postinstall": "npm run hydrate:trigger && npm run hydrate:tests",
-    "test": "QUIET=1 tape test/integration-test.js | tap-spec"
+    "postinstall": "npm run hydrate:trigger",
+    "test": "QUIET=1 tape test/integration-test.js | tap-spec",
+    "rc": "npm version prerelease --preid RC"
   },
   "author": "Ryan Bethel",
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/architect/plugin-budget-watch.git"
+  },
+  "license": "Apache-2.0",
   "dependencies": {
     "@architect/architect": "^9.0.1"
   },
@@ -18,6 +29,10 @@
     "tap-spec": "^5.0.0",
     "tape": "^5.3.1"
   },
+  "files": [
+    "index.js",
+    "src"
+  ],
   "eslintConfig": {
     "extends": "@architect/eslint-config"
   }

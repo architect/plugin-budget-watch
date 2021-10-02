@@ -26,7 +26,7 @@ publish-log
 @scheduled
 daily-update-buddy rate(1 day)
 
-@macros
+@plugins
 plugin-budget-watch
 
 ${budget}
@@ -153,9 +153,10 @@ limit $100`)
 
 
 
-test('Teardown App', t => {
+test('Teardown App', async t => {
   t.plan(1)
-  execSync(`npx arc destroy --app "${appName}" -stackname "${uniqueName}" --force --now`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } )
+  await (new Promise(resolve => setTimeout(resolve, 1000 * 30)))
+  execSync(`npx arc destroy --app "${appName}" -name "${uniqueName}" --force --now`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } )
   t.pass('The app is gone')
 })
 

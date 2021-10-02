@@ -14,7 +14,7 @@ publish-log
 @scheduled
 daily-update-buddy rate(1 day)
 
-@macros
+@plugins
 plugin-budget-watch
 
 
