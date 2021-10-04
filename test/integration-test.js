@@ -155,9 +155,9 @@ limit $100`)
 
 test('Teardown App', async t => {
   t.plan(1)
-  await (new Promise(resolve => setTimeout(resolve, 1000 * 30)))
-  execSync(`npx arc destroy --app "${appName}" -name "${uniqueName}" --force --now`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } )
-  t.pass('The app is gone')
+  execSync(`npx arc destroy --app "${appName}" --name "${uniqueName}" --force --now`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } ).toString()
+  t.pass( 'The app is gone')
+  // t.ok(destroyOutput.includes(`Successfully destroyed ${cfnName}`), 'The app is gone')
 })
 
 

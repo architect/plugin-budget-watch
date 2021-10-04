@@ -22,38 +22,28 @@ exports.handler =  async function handler (event) {
       ResourcesPerPage: 100,
       TagFilters: [ { Key: 'aws:cloudformation:stack-name', Values: [ stackName ] } ]
     }
-    try {
-      let hasNext = true
-      while (hasNext) {
-        let resourceCommand = new GetResourcesCommand(resourceInput)
-        let resourceResponse = await resourceClient.send(resourceCommand)
-        let PaginationToken = resourceResponse.PaginationToken
-        allLambdas.push(resourceResponse.ResourceTagMappingList)
-        hasNext = PaginationToken
-        if (hasNext) resourceInput = { ...resourceInput, PaginationToken }
-      }
+    let hasNext = true
+    while (hasNext) {
+      let resourceCommand = new GetResourcesCommand(resourceInput)
+      let resourceResponse = await resourceClient.send(resourceCommand)
+      let PaginationToken = resourceResponse.PaginationToken
+      allLambdas.push(resourceResponse.ResourceTagMappingList)
+      hasNext = PaginationToken
+      if (hasNext) resourceInput = { ...resourceInput, PaginationToken }
+    }
 
-      targetLambdas = allLambdas.map(group => group.map(item => item.ResourceARN))
-        .flat()
-        .filter(lambda => !lambda.includes(triggerLambda) && !lambda.includes(resetLambda))
-      console.log({ targetLambdas })
-    }
-    catch (e){
-      console.log(e)
-      return
-    }
+    targetLambdas = allLambdas.map(group => group.map(item => item.ResourceARN))
+      .flat()
+      .filter(lambda => !lambda.includes(triggerLambda) && !lambda.includes(resetLambda))
+    console.log({ targetLambdas })
 
     let lambdaClient = new LambdaClient({ region })
     let concurrencyResponses = await Promise.all(targetLambdas.map(lambda => {
       let getLambdaCommand = new GetFunctionConcurrencyCommand({ FunctionName: lambda })
-      return  lambdaClient.send(getLambdaCommand).catch(e => {
-        console.log(e)
-        return { ReservedConcurrentExecutions: 'not found' }
-      })
+      return  lambdaClient.send(getLambdaCommand)
     }))
     let concurrencies = concurrencyResponses.map(response => response.ReservedConcurrentExecutions)
     let concurrencyPairs = targetLambdas.map((name, i) => ([ name, concurrencies[i] ]))
-      .filter(pair => pair[1] !== 'not found')
     console.log({ concurrencyPairs })
 
     let ssmClient = new SSMClient({ region })
@@ -65,12 +55,7 @@ exports.handler =  async function handler (event) {
       Tag: { Key: 'aws:cloudformation:stack-name', Value: stackName }
     }
     let ssmCommand = new PutParameterCommand(ssmParams)
-    try {
-      await ssmClient.send(ssmCommand)
-    }
-    catch (e) {
-      console.log(e)
-    }
+    await ssmClient.send(ssmCommand)
 
     let putLambdaCommands = await Promise.all(targetLambdas.map(lambda => {
       let lambdaCommand = new PutFunctionConcurrencyCommand({ FunctionName: lambda,
