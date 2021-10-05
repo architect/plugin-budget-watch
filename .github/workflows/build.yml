@@ -95,7 +95,7 @@ jobs:
 
       - name: Publish @latest to npm
         if: contains(github.ref, 'RC') == false #'!contains()'' doesn't work lol
-        run: npm publish
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
