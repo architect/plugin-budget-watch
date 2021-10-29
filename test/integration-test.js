@@ -64,9 +64,9 @@ test('Deploy App', t => {
 })
 
 
-let testProfile = 'plugin-test-profile'
+// let testProfile = 'plugin-test-profile'
 let region = 'us-east-1'
-let credentials = new AWS.SharedIniFileCredentials({ profile: testProfile })
+let credentials = new AWS.SharedIniFileCredentials({})
 AWS.config.credentials = credentials
 AWS.config.update({ region })
 let  resourcegroupstaggingapi = new AWS.ResourceGroupsTaggingAPI()
