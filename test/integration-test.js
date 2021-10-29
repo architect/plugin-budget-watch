@@ -31,9 +31,6 @@ plugin-budget-watch
 
 ${budget}
 
-@aws
-region us-east-1
-profile plugin-test-profile
 `
 }
 
