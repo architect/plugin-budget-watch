@@ -1,6 +1,6 @@
 
 @app
-integration-test
+budget-test
 
 @http
 get /

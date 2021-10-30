@@ -8,11 +8,10 @@ let utils = require('@architect/utils')
 let fs = require('fs')
 
 let appDir = path.resolve(__dirname, './test-app')
-
 function manifest (budget){
   return  `
 @app
-integration-test
+budget-test
 
 @http
 get /
@@ -31,6 +30,9 @@ plugin-budget-watch
 
 ${budget}
 
+@aws
+region us-east-1
+${process.env.AWS_ACCESS_KEY_ID ? '' : 'profile plugin-test-profile'}
 `
 }
 
@@ -64,10 +66,13 @@ test('Deploy App', t => {
 })
 
 
-// let testProfile = 'plugin-test-profile'
+let testProfile = 'plugin-test-profile'
 let region = 'us-east-1'
-// let credentials = new AWS.SharedIniFileCredentials({})
-// AWS.config.credentials = credentials
+let credentials
+if (!process.env.AWS_ACCESS_KEY_ID){
+  credentials = new AWS.SharedIniFileCredentials({ profile: testProfile })
+  AWS.config.credentials = credentials
+}
 AWS.config.update({ region })
 let  resourcegroupstaggingapi = new AWS.ResourceGroupsTaggingAPI()
 let lambdaArns
