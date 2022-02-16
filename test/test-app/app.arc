@@ -16,6 +16,7 @@ daily-update-buddy rate(1 day)
 
 @plugins
 plugin-budget-watch
+  src ../..
 
 
 @budget

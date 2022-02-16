@@ -1,7 +1,7 @@
 {
   "name": "@architect/plugin-budget-watch",
   "version": "0.0.4",
-  "description": "Architect plugin for limiting cost of deployed apps",
+  "description": "Architect plugin for limiting the cost of deployed apps",
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --fix",
@@ -21,13 +21,14 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/architect": "^9.0.1"
+    "@architect/architect": "^10.0.0-RC.7",
+    "@architect/utils": "^3.0.4"
   },
   "devDependencies": {
-    "@architect/eslint-config": "^2.0.0",
-    "eslint": "^7.11.0",
+    "@architect/eslint-config": "^2.0.1",
+    "eslint": "^8.9.0",
     "tap-spec": "^5.0.0",
-    "tape": "^5.3.1"
+    "tape": "^5.5.2"
   },
   "files": [
     "index.js",

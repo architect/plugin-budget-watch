@@ -1,7 +1,7 @@
 let { toLogicalID } = require('@architect/utils')
 let path = require('path')
 
-function package ({ arc, cloudformation }) {
+function start ({ arc, cloudformation }) {
 
   let guard = arc['budget']
 
@@ -238,7 +238,7 @@ function package ({ arc, cloudformation }) {
             } else {
               sendSuccess()
             }
- 
+
 
             function sendSuccess(){
               let responseData = {DependsOn:'ready'}
@@ -254,11 +254,11 @@ function package ({ arc, cloudformation }) {
                 console.log({ssmResponse})
                 if (ssmResponse?.Parameter?.Value){
                   let throttled = JSON.parse(ssmResponse.Parameter.Value)
-                  let concurrencyResponses = await Promise.all(throttled.map(tuple => { 
+                  let concurrencyResponses = await Promise.all(throttled.map(tuple => {
                     if (tuple[1] === null || tuple[1] === undefined){
                       return lambda.deleteFunctionConcurrency({ FunctionName:tuple[0], ReservedConcurrentExecutions:tuple[1] })
                         .promise().catch( e => console.log(e) )
-                    } else { 
+                    } else {
                       return lambda.putFunctionConcurrency({ FunctionName:tuple[0], ReservedConcurrentExecutions:tuple[1] })
                         .promise().catch( e => console.log(e) )
                     }
@@ -282,4 +282,4 @@ function package ({ arc, cloudformation }) {
 
 }
 
-module.exports = { package }
+module.exports = { deploy: { start } }

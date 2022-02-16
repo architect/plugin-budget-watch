@@ -8,7 +8,7 @@ let utils = require('@architect/utils')
 let fs = require('fs')
 
 let appDir = path.resolve(__dirname, './test-app')
-function manifest (budget){
+function manifest (budget) {
   return  `
 @app
 budget-test
@@ -27,6 +27,7 @@ daily-update-buddy rate(1 day)
 
 @plugins
 plugin-budget-watch
+  src ../..
 
 ${budget}
 
@@ -61,7 +62,14 @@ test('Deploy App', t => {
   t.plan(1)
   uniqueName = 'A' + crypto.randomBytes(3).toString('hex')
   cfnName = utils.toLogicalID(appName) + 'Staging' + uniqueName
-  execSync(`npx arc deploy --name "${uniqueName}"`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } )
+  try {
+    execSync(`npx arc deploy --name "${uniqueName}"`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } )
+  }
+  catch (err) {
+    console.log(err)
+    console.log(err.stdout.toString())
+    t.fail(err)
+  }
   t.pass('It deployed')
 })
 
@@ -74,7 +82,7 @@ if (!process.env.AWS_ACCESS_KEY_ID){
   AWS.config.credentials = credentials
 }
 AWS.config.update({ region })
-let  resourcegroupstaggingapi = new AWS.ResourceGroupsTaggingAPI()
+let resourcegroupstaggingapi = new AWS.ResourceGroupsTaggingAPI()
 let lambdaArns
 test('Find Stack Lambdas', async t => {
   t.plan(1)
@@ -137,8 +145,14 @@ test('Reset On Deploy', async t => {
 limit $100`)
 
   fs.writeFileSync(path.join(appDir, 'app.arc'), resetManifest)
-
-  execSync(`npx arc deploy --name "${uniqueName}"`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } )
+  try {
+    execSync(`npx arc deploy --name "${uniqueName}"`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } )
+  }
+  catch (err) {
+    console.log(err)
+    console.log(err.stdout.toString())
+    t.fail(err)
+  }
   t.pass('It it reployed')
   let resetTargetCon = (await Promise.all(targets.map(arn => lambda.getFunctionConcurrency({ FunctionName: arn }).promise())))
     .map(resp => resp.ReservedConcurrentExecutions)
@@ -146,20 +160,20 @@ limit $100`)
   let resetResetCon = (await lambda.getFunctionConcurrency({ FunctionName: reset }).promise()).ReservedConcurrentExecutions
   t.ok(triggerCon === resetTriggerCon, 'Trigger reset')
   t.ok(resetCon === resetResetCon, 'Reset reset')
-  // let sortedTarget =[...targetCon].sort()
-  // let sortedResetTarget =[...resetTargetCon].sort()
   t.deepEqual(resetTargetCon, resetTargetCon, 'All Lambdas Reset')
-
-
 })
 
 
 
 test('Teardown App', async t => {
   t.plan(1)
-  execSync(`npx arc destroy --app "${appName}" --name "${uniqueName}" --force --now`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } ).toString()
+  try {
+    execSync(`npx arc destroy --app "${appName}" --name "${uniqueName}" --force --now`, { cwd: appDir, timeout: 1000 * 60 * 60 * 5 } ).toString()
+  }
+  catch (err) {
+    console.log(err)
+    console.log(err.stdout.toString())
+    t.fail(err)
+  }
   t.pass( 'The app is gone')
-  // t.ok(destroyOutput.includes(`Successfully destroyed ${cfnName}`), 'The app is gone')
 })
-
-
