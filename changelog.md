@@ -2,6 +2,14 @@
 
 ---
 
+## [0.0.5] 2022-02-16
+
+Update to Arc 10 Plugin API
+
+Plugin is compatible with Arc 10 or above.
+
+---
+
 ## [0.0.1] 2021-10-01
 
 Initial Release
