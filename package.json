@@ -1,6 +1,6 @@
 {
   "name": "@architect/plugin-budget-watch",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Architect plugin for limiting the cost of deployed apps",
   "main": "index.js",
   "scripts": {
